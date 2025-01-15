@@ -1,0 +1,35 @@
+# Blender 4.0.2 MTL File: 'None'
+# www.blender.org
+
+newmtl PolygonCity_Glass_Mat
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.285075 0.435294 0.391358
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ke ./Emissive_01.png
+map_Bump -bm 1.000000 ./PolygonCity_Texture_Normal.png
+
+newmtl PolygonCity_Mat_01_A.003
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+illum 2
+map_Kd ./PolygonCity_Texture_01_A.png
+map_Ke ./Emissive_01.png
+map_d ./PolygonCity_Texture_01_A.png
+map_Bump -bm 1.000000 ./PolygonCity_Texture_Normal.png
+
+newmtl PolygonCity_Mat_04_A
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+illum 2
+map_Kd ./PolygonCity_Texture_04_A.png
+map_Ke ./Emissive_01.png
+map_d ./PolygonCity_Texture_04_A.png
+map_Bump -bm 1.000000 ./PolygonCity_Texture_Normal.png
