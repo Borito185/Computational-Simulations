@@ -22,15 +22,48 @@ city grid and the buildings are represented in the code.
 
 Task 1: Check out the City class in the city.py file read carefully the comments
         in the code then answer the following questions:
+        
         - How is the city grid represented in the code?
+        as a single dimension array where all rows are concated to each other like:
+        | a | b |
+        | c | d |
+        to:
+        [a, b, c, d]
+        
         - How is a building represented in the code?
+        as an object that is stored within the grid array
+        
         - How do we get the building at a specific row and column?
+        you convert the grid coordinates to array coordinates using the following formula:
+        row * row size + col
+        the result is used to query the grid array for the object at that position on the grid
+        
         - How do we set the building at a specific row and column?
+        Use the same formula above but instead of reading you set it.
+        
         - How do we get the type of the building at a specific row and column?
+        you get the building at that position and return `BuildingType.Empty` if its `None`
+        else you expect it to be object and return its type
+        
         - How do we swap two buildings at different rows and columns?
+        little bit of python trickery but basically make a tuple with the values of the buildings 
+        and then apply the tuple to the swapped positions.
+
         - How do we compute the sunlight scores of the city?
+        sunlight score is calculated by app 
+        and the first 11 elements in the returned array are passed through
+
         - How do we print the city grid in the console?
+        we loop over the rows and columns
+        and print each building type on that position
+
         - How do we initialize the city grid?
+        We initialize the city grid by:
+        > generating the grid
+        > random selecting a building type for each grid cell
+        > create building geometry using respective building class
+        > set buildings to correct position using update method
+        
 
 In the last exercise, you were asked to implement your own building classes: the
 Skyscraper, Highrise and Office classes. In this exercise, we will reuse the

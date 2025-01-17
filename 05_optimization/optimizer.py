@@ -12,20 +12,7 @@ class Optimizer:
             print_info (bool):
                 Whether to print information about the optimization step.
         """
-        # TODO: Implement your optimization algorithm here.
-        #  Hint: You can use the following code to swap two buildings:
-        row1, col1 = randint(0, self._city._plots_per_row - 1), randint(0, self._city._plots_per_col - 1)
-        row2, col2 = randint(0, self._city._plots_per_row - 1), randint(0, self._city._plots_per_col - 1)
-        self._city.swap_buildings(row1, col1, row2, col2)
-        #  Hint: You can use the function `compute_sunlight_scores` of the City class
-        #  to compute the sunlight scores
-        new_scores = self._city.compute_sunlight_scores()
-        if print_info:
-            print("New scores: ", new_scores)
-            print("New scores sum: ", sum(new_scores))
-            print("New city layout: ")
-            self._city.print_plots()
-        return sum(new_scores)
+        return self.parallelized_random(print_info)
 
     def optimize(self, n_steps=100, print_info=False):
         """
@@ -49,3 +36,63 @@ class Optimizer:
             score = self.step(print_info)
             # TODO: Add a stopping criterion here.
         print(f"\nDone! Final score: {score}")
+
+    # this function creates k versions of the grid and applies n-m swaps to each
+    # the best version (can be original) is selected and will be the result of this step
+    def parallelized_random(self, print_info, k=8, n=10, m=50):
+        # create random new version of input
+
+        print("test1 ", sum(self._city.compute_sunlight_scores()))
+        print("test2 ", sum(self._city.compute_sunlight_scores()))
+        print("test3 ", sum(self._city.compute_sunlight_scores()))
+        print("test4 ", sum(self._city.compute_sunlight_scores()))
+        print("test5 ", sum(self._city.compute_sunlight_scores()))
+        
+        modification_list = [[]] # empty array is to carry over the input as a possible output
+        for i in range(k):
+            swap_count = randint(n, m)
+            swaps = []
+            for j in range(swap_count):
+                swap = self.random_swap_coords()
+                swaps.append(swap)
+            modification_list.append(swaps)
+
+        # evaluate random versions
+        scores = []    
+        for swap_arr in modification_list:
+            self.apply_swaps(swap_arr)
+            scores.append(self.calc_score())
+            self.apply_swaps(reversed(swap_arr))
+
+        # select best
+        best = scores.index(max(scores))
+        self.apply_swaps(modification_list[best])
+
+        if print_info:
+            print("Version sums: ", scores)
+            print("New scores sum: ", scores[best])
+            print("New city layout: ")
+            self._city.print_plots()
+
+        return scores[best]
+
+
+
+    def random_swap_coords(self):
+        row_size = self._city._plots_per_row
+        col_size = self._city._plots_per_col
+        row1, col1 = randint(0, row_size - 1), randint(0, col_size - 1)
+        row2, col2 = randint(0, row_size - 1), randint(0, col_size - 1)
+        return ((row1, col1), (row2, col2))
+
+    def apply_swaps(self, swap_arr):
+        for i, current in enumerate(swap_arr):
+            ((row1, col1), (row2, col2)) = current
+            self._city.swap_buildings(row1, col1, row2, col2)
+
+    def calc_score(self):
+        scores = []
+        for i in range(5):
+            score = sum(self._city.compute_sunlight_scores())
+            scores.append(score)
+        return sum(scores) / len(scores)
