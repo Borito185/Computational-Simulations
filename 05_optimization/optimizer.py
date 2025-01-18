@@ -1,5 +1,12 @@
 from random import randint
+from city import BuildingType
+import math
+from itertools import product
+import numpy as np
 
+    
+def pythagoras(x, y):
+    return math.sqrt(math.pow(x, 2) + math.pow(y, 2))
 
 class Optimizer:
     def __init__(self, city):
@@ -39,14 +46,8 @@ class Optimizer:
 
     # this function creates k versions of the grid and applies n-m swaps to each
     # the best version (can be original) is selected and will be the result of this step
-    def parallelized_random(self, print_info, k=8, n=10, m=50):
+    def parallelized_random(self, print_info, k=6, n=2, m=6):
         # create random new version of input
-
-        print("test1 ", sum(self._city.compute_sunlight_scores()))
-        print("test2 ", sum(self._city.compute_sunlight_scores()))
-        print("test3 ", sum(self._city.compute_sunlight_scores()))
-        print("test4 ", sum(self._city.compute_sunlight_scores()))
-        print("test5 ", sum(self._city.compute_sunlight_scores()))
         
         modification_list = [[]] # empty array is to carry over the input as a possible output
         for i in range(k):
@@ -61,7 +62,7 @@ class Optimizer:
         scores = []    
         for swap_arr in modification_list:
             self.apply_swaps(swap_arr)
-            scores.append(self.calc_score())
+            scores.append(self.score())
             self.apply_swaps(reversed(swap_arr))
 
         # select best
@@ -73,7 +74,7 @@ class Optimizer:
             print("New scores sum: ", scores[best])
             print("New city layout: ")
             self._city.print_plots()
-
+        print(scores[best])
         return scores[best]
 
 
@@ -89,10 +90,70 @@ class Optimizer:
         for i, current in enumerate(swap_arr):
             ((row1, col1), (row2, col2)) = current
             self._city.swap_buildings(row1, col1, row2, col2)
+    
+    # rules:
+    # 1. skyscrapers/highrises may not be directly next to each other, to avoid a wind funnel like with eemcs faculty building
+    # 2. houses should be near atleast 3 other houses in the nearby 8 tiles,
+    #    to make the neighbourhoods more fun
+    # 3. the parks should be spread evenly
+    #    (every non-empty tile should be as close as possible to the nearest park)
+    # 4. To encourage competitiveness each office should be directly neighboured by another office
+    # 5. To make a compact city, empty tiles should be away from the center and near the border
+    def score(self):
+        score = 0
 
-    def calc_score(self):
-        scores = []
-        for i in range(5):
-            score = sum(self._city.compute_sunlight_scores())
-            scores.append(score)
-        return sum(scores) / len(scores)
+        num_rows = self._city.rows
+        num_cols = self._city.cols
+        for i in range(num_rows):
+            for j in range(num_cols):
+                type = self._city.get_building_type(i, j)
+                if type == BuildingType.EMPTY: # rule 5
+                    offset_row = i - num_rows/2
+                    offset_col = j - num_cols/2
+                    score += np.clip(pythagoras(offset_row, offset_col) / 20, 0, 1)
+                elif type == BuildingType.HIGHRISE or type == BuildingType.SKYSCRAPER: # rule 1
+                    neighbours = []
+                    neighbours.append((i,j-1))
+                    neighbours.append((i,j+1))
+                    neighbours.append((i+1,j))
+                    neighbours.append((i+1,j))
+                    types = [self._city.get_building_type(row, col) for (row, col) in neighbours if 0 <= row < num_rows and 0 <= col < num_cols]
+                    if BuildingType.HIGHRISE not in types and BuildingType.SKYSCRAPER not in types:
+                        score += 0.8
+                elif type == BuildingType.HOUSE: # rule 2
+                    neighbours = []
+                    neighbours.append((i-1,j-1))
+                    neighbours.append((i-1,j+1))
+                    neighbours.append((i+1,j-1))
+                    neighbours.append((i+1,j+1))
+                    neighbours.append((i,j-1))
+                    neighbours.append((i,j+1))
+                    neighbours.append((i+1,j))
+                    neighbours.append((i+1,j))
+                    types = [self._city.get_building_type(row, col) for (row, col) in neighbours if 0 <= row < num_rows and 0 <= col < num_cols]
+                    if types.count(BuildingType.HOUSE) >= 3:
+                        score += 0.8
+                elif type == BuildingType.OFFICE: # rule 4
+                    neighbours = []
+                    neighbours.append((i,j-1))
+                    neighbours.append((i,j+1))
+                    neighbours.append((i+1,j))
+                    neighbours.append((i+1,j))
+                    types = [self._city.get_building_type(row, col) for (row, col) in neighbours if 0 <= row < num_rows and 0 <= col < num_cols]
+                    if BuildingType.OFFICE in types:
+                        score += 0.8
+                if type != BuildingType.PARK and type != BuildingType.EMPTY: # rule 3
+                    row_list = range(i-3, i+4)
+                    col_list = range(j-3, j+4)
+                    neighbours = product(row_list, col_list)
+                    types = [(row, col, self._city.get_building_type(row, col)) for (row, col) in neighbours if 0 <= row < num_rows and 0 <= col < num_cols]
+                    park_distances = [pythagoras(row-i, col-j) for (row, col, bt) in types if bt is BuildingType.PARK]
+                    closest = min(park_distances, default=5)
+                    if closest <= 1.5:
+                        score += 0.2
+                    elif closest <= 3.5:
+                        score += (closest - 1.5) * 0.1
+                if type == BuildingType.PARK:
+                    score += 1
+        return score
+    
