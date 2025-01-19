@@ -37,6 +37,10 @@ material_basic_door.textures = {
     "diffuse_texture": bk.res_path("../assets/door.jpg"),
 }
 
+material_highrise_window = bk.Material()
+material_highrise_window.textures = {
+    "diffuse_texture": bk.res_path("../assets/highrise_window.jpg")
+}
 class BasicWall(bk.Mesh):
     """
     Create a basic wall mesh with the given size and material.
