@@ -4,11 +4,11 @@ import numpy as np
 
 from buildings import Office, Highrise, Skyscraper, House, Park
 from components import material_basic_ground
-from random import randint
+from random import randint, randrange, shuffle
 from bk7084.math import Mat4, Vec3
 import bk7084 as bk
 import types
-
+import math
 
 class BuildingType(Enum):
     """Enum for the type of building"""
@@ -177,12 +177,30 @@ class City:
         - 15% of the plots should be parks
         - the remaining plots can be whatever you want
         """
-        # TODO: Randomize the city grid in a smart way.
+        
+        cells = self._plots_per_row * self._plots_per_col
+        hs_c = math.ceil(cells * 0.37)
+        of_c = math.ceil(cells * 0.25)
+        hr_c = math.ceil(cells * 0.8)
+        sk_c = math.ceil(cells * 0.5)
+        pk_c = math.ceil(cells * 0.15)
+
+        buildings = []
+        buildings.extend([BuildingType(1) for i in range(hs_c)])
+        buildings.extend([BuildingType(2) for i in range(of_c)])
+        buildings.extend([BuildingType(3) for i in range(hr_c)])
+        buildings.extend([BuildingType(4) for i in range(sk_c)])
+        buildings.extend([BuildingType(5) for i in range(pk_c)])
+        r_c = cells - buildings.count()
+        buildings.extend([BuildingType(randint(0, 5)) for i in range(r_c)])
+
+        shuffle(buildings)
+
         for row in range(self._plots_per_row):
             for col in range(self._plots_per_col):
                 # Generate a random number between 0 and 5 (inclusive)
                 # and set the plot type accordingly
-                building_type = BuildingType(randint(0, 5))
+                building_type = buildings.pop()
                 self.construct_building(row, col, building_type)
 
     def clear_grid(self):

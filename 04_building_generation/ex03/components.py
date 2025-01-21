@@ -28,16 +28,15 @@ material_basic_window.textures = {
     "diffuse_texture": bk.res_path("../assets/window.jpg"),
 }
 
-material_basic_ground = bk.Material()
-material_basic_ground.textures = {
-    "diffuse_texture": bk.res_path("../assets/grass.jpg"),
-}
-
 material_basic_door = bk.Material()
 material_basic_door.textures = {
     "diffuse_texture": bk.res_path("../assets/door.jpg"),
 }
 '''
+material_basic_ground = bk.Material()
+material_basic_ground.textures = {
+    "diffuse_texture": bk.res_path("../assets/grass.jpg"),
+}
 material_highrise_window = bk.Material()
 material_highrise_window.textures = {
     "diffuse_texture": bk.res_path("../assets/Highrise_window.jpg")
