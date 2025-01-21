@@ -191,7 +191,7 @@ class City:
         buildings.extend([BuildingType(3) for i in range(hr_c)])
         buildings.extend([BuildingType(4) for i in range(sk_c)])
         buildings.extend([BuildingType(5) for i in range(pk_c)])
-        r_c = cells - buildings.count()
+        r_c = cells - len(buildings)
         buildings.extend([BuildingType(randint(0, 5)) for i in range(r_c)])
 
         shuffle(buildings)

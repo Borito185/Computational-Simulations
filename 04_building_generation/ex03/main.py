@@ -68,23 +68,21 @@ win = bk.Window()
 win.set_title("BK7084 - Lab 4 - Building Generation [ex03]")
 win.set_size(800, 800)
 win.set_resizable(True)
-
 app = bk.App()
 camera = app.create_camera(
     pos=Vec3(18, 18, 26), look_at=Vec3(0, 0, 0), fov_v=60.0, background=bk.Color.ICE_BLUE
 )
 camera.set_as_main_camera()
-
 app.add_directional_light(Vec3(-1, -1, -1), bk.Color(0.8, 0.8, 0.8))
 
-skyscraper = Skyscraper(app, 5, 3)
+skyscraper = Skyscraper(app, 20, 6)
 skyscraper.building.set_transform(Mat4.identity())
 
-highrise = Highrise(app, 1, 3)
-highrise.building.set_transform(Mat4.from_translation(Vec3(6, 0, 0)))
+highrise = Highrise(app, 18, 6)
+highrise.building.set_transform(Mat4.from_translation(Vec3(10, 0, 0)))
 
-office = Office(app, 2, 3)
-office.building.set_transform(Mat4.from_translation(Vec3(-6, 0, 0)))
+office = Office(app, 10, 6)
+office.building.set_transform(Mat4.from_translation(Vec3(-10, 0, 0)))
 
 ground_mesh = bk.Mesh.create_quad(48, bk.Alignment.XY)
 ground_mesh.set_material(material_basic_ground)
