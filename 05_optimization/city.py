@@ -240,12 +240,14 @@ class City:
             building = Office(self._app, num_floors, 3)
         elif building_type is BuildingType.HIGHRISE:
             # TODO: replace the following line with your own code to create a highrise
+            num_floors = randint(5, 18)
             building = Skyscraper(
-                self._app, 5, 3
+                self._app, num_floors, 3
             )
         elif building_type is BuildingType.SKYSCRAPER:
             # TODO: replace the following line with your own code to create a skyscraper
-            building = Skyscraper(self._app, 8, 3)
+            num_floors = randint(6, 20)
+            building = Skyscraper(self._app, num_floors, 3)
         elif building_type is BuildingType.PARK:
             building = Park(self._app)
 

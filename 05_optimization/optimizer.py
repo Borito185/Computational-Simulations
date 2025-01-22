@@ -92,7 +92,7 @@ class Optimizer:
             self._city.swap_buildings(row1, col1, row2, col2)
     
     # rules:
-    # 1. skyscrapers/highrises may not be directly next to each other, to avoid a wind funnel like with eemcs faculty building
+    # 1. skyscrapers/highrises should be near the center
     # 2. houses should be near atleast 3 other houses in the nearby 8 tiles,
     #    to make the neighbourhoods more fun
     # 3. the parks should be spread evenly
@@ -112,14 +112,11 @@ class Optimizer:
                     offset_col = j - num_cols/2
                     score += np.clip(pythagoras(offset_row, offset_col) / 20, 0, 1)
                 elif type == BuildingType.HIGHRISE or type == BuildingType.SKYSCRAPER: # rule 1
-                    neighbours = []
-                    neighbours.append((i,j-1))
-                    neighbours.append((i,j+1))
-                    neighbours.append((i+1,j))
-                    neighbours.append((i+1,j))
-                    types = [self._city.get_building_type(row, col) for (row, col) in neighbours if 0 <= row < num_rows and 0 <= col < num_cols]
-                    if BuildingType.HIGHRISE not in types and BuildingType.SKYSCRAPER not in types:
-                        score += 0.8
+                    offset_row = i - num_rows/2
+                    offset_col = j - num_cols/2
+                    distance = pythagoras(offset_row, offset_col)
+                     
+                    score += (1 - np.clip(distance-5 / 15, 0, 1)) * 0.8
                 elif type == BuildingType.HOUSE: # rule 2
                     neighbours = []
                     neighbours.append((i-1,j-1))
