@@ -46,7 +46,7 @@ class Optimizer:
 
     # this function creates k versions of the grid and applies n-m swaps to each
     # the best version (can be original) is selected and will be the result of this step
-    def parallelized_random(self, print_info, k=6, n=2, m=6):
+    def parallelized_random(self, print_info, k=6, n=2, m=20):
         # create random new version of input
         
         modification_list = [[]] # empty array is to carry over the input as a possible output

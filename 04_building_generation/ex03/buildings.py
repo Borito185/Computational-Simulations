@@ -86,13 +86,16 @@ class Skyscraper:
         sides_h = [replacement_map.get(cls, cls) for cls in reversed(sides_h)]
         sides_upper.extend(sides_h)
 
+        rotate_factor = randint(3, 15)
+
         for i in range(self.num_floors):
+            rotation = Mat4.from_rotation_y(rotate_factor * i, degrees=True)
             for j in range(max_width):
                 for k in range(max_width):
                     list = sides_ground if i == 0 else sides_upper
                     walls = [list[j], list[k], list[j], list[k]]
-                    transform = Mat4.from_translation(Vec3(j - max_width/2 + 0.5, i, k - max_width/2 + 0.5))
-                    CreateVoxel(app, self.building, transform, 1, BasicFloor, walls)
+                    transform = rotation * Mat4.from_translation(Vec3(j - max_width/2 + 0.5, i, k - max_width/2 + 0.5)) 
+                    CreateVoxel(app, self.building, transform, BasicFloor, walls)
 
 
 class Highrise:
@@ -120,6 +123,7 @@ class Highrise:
         replacement_map = {}
 
         half = math.floor(max_width/2)
+        max_width = half * 2
         sides_h = [SelectRandomComponent(ground_floor) for i in range(half)]
         sides_ground = []
         sides_ground.extend(sides_h)
@@ -137,12 +141,14 @@ class Highrise:
         sides_upper.extend(sides_h)
 
         for i in range(self.num_floors):
-            for j in range(max_width):
-                for k in range(max_width):
-                    list = sides_ground if i == 0 else sides_upper
-                    walls = [list[j], list[k], list[j], list[k]]
-                    transform = Mat4.from_translation(Vec3(j - max_width/2 + 0.5, i, k - max_width/2 + 0.5))
-                    CreateVoxel(app, self.building, transform, 1, BasicFloor, walls)
+            for j in range(half):
+                for k in range(half):
+                    for l in range(6):
+                        rotation = Mat4.from_rotation_y(60 * l, True)
+                        list = sides_ground if i == 0 else sides_upper
+                        walls = [list[j], list[k], list[j], list[k]]
+                        transform = rotation * Mat4.from_translation(Vec3(j - half/2 + 0.5, i, k - half/2 + 0.5)) * Mat4.from_translation(Vec3(0,0,1.1))
+                        CreateVoxel(app, self.building, transform, BasicFloor, walls)
 
 
 class Office:
@@ -186,13 +192,18 @@ class Office:
         sides_h = [replacement_map.get(cls, cls) for cls in reversed(sides_h)]
         sides_upper.extend(sides_h)
 
+        skip_x = randint(0,max_width-3)
+        skip_z = randint(0,max_width-3)
+
         for i in range(self.num_floors):
             for j in range(max_width):
                 for k in range(max_width):
+                    if ((skip_x <= j <= skip_x + 2) and (skip_z <= k <= skip_z + 2)): continue
+
                     list = sides_ground if i == 0 else sides_upper
                     walls = [list[j], list[k], list[j], list[k]]
                     transform = Mat4.from_translation(Vec3(j - max_width/2 + 0.5, i, k - max_width/2 + 0.5))
-                    CreateVoxel(app, self.building, transform, 1, BasicFloor, walls)
+                    CreateVoxel(app, self.building, transform, BasicFloor, walls)
 
 def SelectRandomComponent(components):
     count = len(components)
@@ -202,20 +213,25 @@ def SelectRandomComponent(components):
         return components[0]
     return components[randint(0, count-1)]
 
-def CreateVoxel(app, parent, pos, size, roof, walls):
-    adjust = size/3
+def CreateVoxel(app, parent, pos, roof, walls):
     # ground
-    floor1 = app.add_mesh(BasicFloor(3, 3), parent=parent)
-    floor1.set_transform(pos * Mat4.from_scale(Vec3(adjust,adjust,adjust)))
+    floor1 = app.add_mesh(BasicFloor(), parent=parent)
+    floor1.set_transform(pos)
     floor1.set_visible(True)
+
+    # floor overhang
+    floor3 = app.add_mesh(BasicFloor(), parent=floor1)
+    floor3.set_transform(Mat4.from_rotation_x(180, True))
+    floor3.set_visible(True)
+
     # roof 
-    floor2 = app.add_mesh(roof(3, 3), parent=floor1)
-    floor2.set_transform(Mat4.from_translation(Vec3(0, 3, 0)))
+    floor2 = app.add_mesh(roof(), parent=floor1)
+    floor2.set_transform(Mat4.from_translation(Vec3(0, 1, 0)))
     floor2.set_visible(True)
     # walls
     for i in range(4):
-        wall = app.add_mesh(walls[i](3, 3), parent=floor1)
+        wall = app.add_mesh(walls[i](1, 1), parent=floor1)
         transform = Mat4.from_rotation_y((math.pi/2) * i) 
-        transform *= Mat4.from_translation(Vec3(0, 3 / 2, 3 / 2))
+        transform *= Mat4.from_translation(Vec3(0, 1 / 2, 1 / 2))
         wall.set_transform(transform)
         wall.set_visible(True)
