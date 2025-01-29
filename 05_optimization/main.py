@@ -130,7 +130,7 @@ center_pos = Vec3(0, np.cos(inclination), np.sin(inclination))
 starting_pos = Mat3.from_rotation_z(-np.pi * 0.5) * center_pos
 light = app.add_directional_light(Vec3(0.0) - starting_pos, bk.Color(0.8, 0.8, 0.8))
 
-city = City(app, 32, 32, 8)
+city = City(app, 10, 10, 8)
 optimizer = Optimizer(city)
 run_optimizer = False
 
